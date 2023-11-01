@@ -4,7 +4,7 @@ import cp from "child_process";
 import lodash from "lodash";
 import core from "@actions/core";
 
-const ejson = "/action/ejson-1.4.1";
+const ejson = "ejson";
 
 export default class Action {
   #action;
@@ -30,12 +30,10 @@ export default class Action {
   async run() {
     switch (this.#action) {
       case "encrypt":
-        await this.#encrypt();
-        break;
+        return await this.#encrypt();
 
       case "decrypt":
-        await this.#decrypt();
-        break;
+        return await this.#decrypt();
 
       default:
         throw new Error(`invalid action '${this.#action}'`);
@@ -46,20 +44,34 @@ export default class Action {
     const command = `${ejson} encrypt ${this.#filePath}`;
     const opts = { env: { ...process.env } };
 
-    await this.exec(command, opts);
+    const res = await this.exec(command, opts);
+
+    const out = res.stdout.toString();
+    const err = res.stderr.toString();
+
+    if (!lodash.isEmpty(err)) {
+      throw new Error(err);
+    }
+
+    return out;
   }
 
   async #decrypt() {
     this.#configurePrivateKey();
 
-    const command = `${ejson} decrypt ${this.#filePath} > /decrypted.json`;
+    const command = `${ejson} decrypt ${this.#filePath}`;
     const opts = { env: { ...process.env } };
 
-    await this.exec(command, opts);
+    const res = await this.exec(command, opts);
 
-    const decrypted = fs.readFileSync("/decrypted.json", "utf-8");
+    const out = res.stdout.toString();
+    const err = res.stderr.toString();
 
-    core.setOutput("decrypted", decrypted);
+    if (!lodash.isEmpty(err)) {
+      throw new Error(err);
+    }
+
+    core.setOutput("decrypted", out);
 
     return decrypted;
   }
