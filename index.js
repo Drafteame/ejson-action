@@ -10,8 +10,7 @@ const main = async () => {
   );
 
   try {
-    const decrypted = await action.run();
-    core.info(decrypted);
+    await action.run();
   } catch (e) {
     core.error(e);
   }
