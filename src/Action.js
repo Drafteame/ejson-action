@@ -105,6 +105,8 @@ export default class Action {
       throw new Error(err);
     }
 
+    core.info(`Decrypted: '${out}'`);
+
     core.setOutput("decrypted", out);
 
     core.info("Decrypted successfully...");
