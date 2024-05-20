@@ -21,7 +21,7 @@ describe('Action', () => {
   beforeEach(() => {
     sandbox = sinon.createSandbox();
   });
-s
+
   afterEach(() => {
     sandbox.restore();
   });
