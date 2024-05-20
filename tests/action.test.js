@@ -1,7 +1,7 @@
 import fs from 'fs';
 import util from 'util';
 import core from '@actions/core';
-import Action from './action.js'; // Adjust the import to your file path
+import Action from '../src/action.js'; // Adjust the import to your file path
 import sinon from 'sinon';
 
 describe('Action', () => {
