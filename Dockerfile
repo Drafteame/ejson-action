@@ -17,6 +17,6 @@ RUN mkdir -p /opt/ejson/keys
 COPY . /action
 WORKDIR /action
 
-RUN npm install --production
+RUN npm install --omit=dev
 
 ENTRYPOINT ["node", "/action/index.js"]
