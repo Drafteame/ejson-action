@@ -6,7 +6,16 @@ LABEL "com.github.actions.name"="ejson action"
 LABEL "com.github.actions.description"="Execute encryption and decryption of json files using ejson"
 LABEL "org.opencontainers.image.source"="https://github.com/Drafteame/ejson-action"
 
-RUN curl -sLo ejson.tar.gz https://github.com/Shopify/ejson/releases/download/v1.4.1/ejson_1.4.1_linux_amd64.tar.gz && \
+ARG VERSION
+
+RUN \
+  if curl --output /dev/null --silent --head --fail https://github.com/Shopify/ejson/releases/download/v${VERSION}/ejson_${VERSION}_linux_amd64.tar.gz; then \
+    VERSION=$VERSION; \
+  else \
+    VERSION=$(curl -s https://api.github.com/repos/Shopify/ejson/releases/latest | grep -oP '"tag_name": "\K(.*)(?=")' | sed 's/^v//') && \
+  fi \
+  DOWNLOAD_URL="https://github.com/Shopify/ejson/releases/download/v${VERSION}/ejson_${VERSION}_linux_amd64.tar.gz" && \
+  curl -sLo ejson.tar.gz $DOWNLOAD_URL && \
   tar xfvz ejson.tar.gz && \
   mv ejson /usr/local/bin/ && \
   chmod +x /usr/local/bin/ejson && \
