@@ -6,7 +6,7 @@ LABEL "com.github.actions.name"="ejson action"
 LABEL "com.github.actions.description"="Execute encryption and decryption of json files using ejson"
 LABEL "org.opencontainers.image.source"="https://github.com/Drafteame/ejson-action"
 
-ARG VERSION
+ENV VERSION=${VERSION}
 
 RUN \
   if curl --output /dev/null --silent --head --fail https://github.com/Shopify/ejson/releases/download/v${VERSION}/ejson_${VERSION}_linux_amd64.tar.gz; then \
