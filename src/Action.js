@@ -174,17 +174,20 @@ export default class Action {
 
   async #downloadEjsonBin() {
     let version = this.#ejsonVersion;
+    const testURL = `https://github.com/Shopify/ejson/releases/tag/v${version}`;
 
-    if (version === "") {
+    const response = await fetch(testURL);
+    if (!response.ok) {
       version = await this.#getLatestEjsonVersion();
     }
-
     const ejsonBinURL = `https://github.com/Shopify/ejson/releases/download/v${version}/ejson_${version}_linux_amd64.tar.gz`;
+    const downloadFile = await fetch(ejsonBinURL);
+    const binary = await downloadFile.buffer();
 
-    fs.writeFileSync("/usr/local/bin/ejson", await download(ejsonBinURL));
+    fs.writeFileSync("/usr/local/bin/ejson", binary);
     fs.chmodSync("/usr/local/bin/ejson", 0o755);
 
-    this.#printVersion();
+    await this.#printVersion();
   }
 
   async #getLatestEjsonVersion() {
