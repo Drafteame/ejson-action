@@ -2,7 +2,7 @@ import core from "@actions/core";
 
 import Action from "./src/Action.js";
 
-const { execSync } = require('child_process');
+import { execSync } from 'child_process';
 
 const main = async () => {
   const action = new Action(
