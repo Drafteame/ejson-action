@@ -182,7 +182,8 @@ export default class Action {
     }
     const ejsonBinURL = `https://github.com/Shopify/ejson/releases/download/v${version}/ejson_${version}_linux_amd64.tar.gz`;
     const downloadFile = await fetch(ejsonBinURL);
-    const binary = await downloadFile.buffer();
+    const arrayBuffer = await downloadFile.arrayBuffer();
+    const binary = Buffer.from(arrayBuffer);
 
     fs.writeFileSync("/usr/local/bin/ejson", binary);
     fs.chmodSync("/usr/local/bin/ejson", 0o755);
