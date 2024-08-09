@@ -8,6 +8,7 @@ const main = async () => {
     core.getInput("file_path"),
     core.getInput("private_key"),
     core.getInput("out_file"),
+    core.getInput("ejson_version"),
   );
 
   try {

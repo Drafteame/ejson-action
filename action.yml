@@ -18,6 +18,9 @@ inputs:
   out_file:
     description: "File path to an out json file that should be use to place the decrypted content of the ejson"
     required: false
+  ejson_version:
+    description: "Version of the ejson binary to use"
+    required: false
 
 outputs:
   decrypted:

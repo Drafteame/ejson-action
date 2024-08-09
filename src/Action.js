@@ -3,6 +3,8 @@ import util from "util";
 import cp from "child_process";
 import lodash from "lodash";
 import core from "@actions/core";
+import download from "download";
+import fetch from "node-fetch";
 
 // The ejson command used for encryption and decryption
 const ejson = "ejson";
@@ -12,6 +14,7 @@ export default class Action {
   #filePath;
   #privateKey;
   #outFile;
+  #ejsonVersion;
 
   /**
    * Create a new Action instance.
@@ -20,14 +23,22 @@ export default class Action {
    * @param {string} filePath The path to the JSON file.
    * @param {string} privateKey Optional private key for encryption.
    * @param {string} outFile Path to a destination file were the decrypted content should be placed.
+   * @param {string} ejsonVersion Version of the ejson binary to be downloaded
    */
-  constructor(action, filePath, privateKey = "", outFile = "") {
+  constructor(
+    action,
+    filePath,
+    privateKey = "",
+    outFile = "",
+    ejsonVersion = "",
+  ) {
     this.exec = util.promisify(cp.exec);
 
     this.#action = action;
     this.#filePath = filePath;
     this.#privateKey = privateKey;
     this.#outFile = outFile;
+    this.#ejsonVersion = ejsonVersion;
 
     this.#validate();
   }
@@ -51,6 +62,8 @@ export default class Action {
    * @returns {Promise<string|void>} - The result of the action.
    */
   async run() {
+    await this.#downloadEjsonBin();
+
     switch (this.#action) {
       case "encrypt":
         return await this.#encrypt();
@@ -157,5 +170,29 @@ export default class Action {
 
     core.info(`[${this.#action}] File content: ${filePath}`);
     core.info(content.toString());
+  }
+
+  async #downloadEjsonBin() {
+    let version = this.#ejsonVersion;
+
+    if (version === "") {
+      version = await this.#getLatestEjsonVersion();
+    }
+
+    const ejsonBinURL = `https://github.com/Shopify/ejson/releases/download/v${version}/ejson_${version}_linux_amd64.tar.gz`;
+
+    fs.writeFileSync("/usr/local/bin/ejson", await download(ejsonBinURL));
+    fs.chmodSync("/usr/local/bin/ejson", 0o755);
+  }
+
+  async #getLatestEjsonVersion() {
+    const url = "https://api.github.com/repos/Shopify/ejson/releases/latest";
+
+    let res = await fetch(url);
+    let tagVersion = res.json().tag_name;
+
+    core.info("Latest ejson version: ", tagVersion);
+
+    return tagVersion.replace("v", "");
   }
 }
