@@ -27,7 +27,7 @@ const ejsonVersion = () => {
   const version = core.getInput("ejson_version");
 
     try {
-      const output = execSync(`./script.sh ${version}`, { encoding: 'utf-8' });
+      const output = execSync(`./action/script.sh ${version}`, { encoding: 'utf-8' });
       console.log(output);
     } catch (error) {
       console.error(error);
