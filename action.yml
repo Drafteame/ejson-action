@@ -27,7 +27,12 @@ outputs:
     description: "Decrypted JSON content"
 
 runs:
-  using: "docker"
-  image: "Dockerfile"
-  env:
-    VERSION: ${{ inputs.ejson_version }}
+  using: 'composite'
+  steps:
+    - name: Build Docker image
+      run: |
+        docker build --build-arg EJ_VERSION=${{ inputs.ejson_version }} -t docker_image .
+
+    - name: Run Docker container
+      run: |
+        docker run --rm docker_image
