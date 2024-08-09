@@ -188,7 +188,7 @@ export default class Action {
     fs.writeFileSync("/usr/local/bin/ejson", binary);
     fs.chmodSync("/usr/local/bin/ejson", 0o755);
 
-    await this.#printVersion();
+    //await this.#printVersion();
   }
 
   async #getLatestEjsonVersion() {
