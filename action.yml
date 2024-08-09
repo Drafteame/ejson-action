@@ -29,6 +29,9 @@ outputs:
 runs:
   using: 'composite'
   steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
     - name: Build Docker image
       shell: bash
       run: |
