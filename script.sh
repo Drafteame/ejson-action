@@ -13,7 +13,7 @@ curl -sLo ejson.tar.gz $DOWNLOAD_URL
 tar xfvz ejson.tar.gz
 mv ejson /usr/local/bin/
 chmod +x /usr/local/bin/ejson
-rm ejson.tar.gz
+rm ejson.tar.gz 
 echo "Ejson version: ${VERSION}"
 
 mkdir -p /opt/ejson/keys

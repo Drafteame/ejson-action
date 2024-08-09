@@ -4,6 +4,8 @@ import Action from "./src/Action.js";
 
 import { execSync } from 'child_process';
 
+import path from 'path';
+
 const main = async () => {
   const action = new Action(
     core.getInput("action"),
@@ -25,9 +27,10 @@ const main = async () => {
 
 const ejsonVersion = () => {
   const version = core.getInput("ejson_version");
+  const scriptPath = path.join(__dirname, 'script.sh');
 
     try {
-      const output = execSync(`./action/script.sh ${version}`, { encoding: 'utf-8' });
+      const output = execSync(`${scriptPath} ${version}`, { encoding: 'utf-8' });
       console.log(output);
     } catch (error) {
       console.error(error);
