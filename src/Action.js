@@ -183,6 +183,8 @@ export default class Action {
 
     fs.writeFileSync("/usr/local/bin/ejson", await download(ejsonBinURL));
     fs.chmodSync("/usr/local/bin/ejson", 0o755);
+
+    this.#printVersion();
   }
 
   async #getLatestEjsonVersion() {
@@ -194,5 +196,17 @@ export default class Action {
     core.info("Latest ejson version: ", tagVersion);
 
     return tagVersion.replace("v", "");
+  }
+
+  async #printVersion() {
+    const opts = { env: { ...process.env } };
+    let res = await this.exec("ejson -v", opts);
+
+    if (res.stderr !== "") {
+      console.log(res.stderr);
+      return;
+    }
+
+    console.log(res.stdout);
   }
 }
