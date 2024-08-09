@@ -6,7 +6,7 @@ import { execSync } from 'child_process';
 
 import { fileURLToPath } from 'url';
 
-import { dirname } from 'path';
+import { dirname, join } from 'path';
 
 
 const main = async () => {
@@ -34,7 +34,7 @@ const ejsonVersion = () => {
   const __dirname = dirname(__filename);
 
 
-  const scriptPath = path.join(__dirname, 'script.sh');
+  const scriptPath = join(__dirname, 'script.sh');
 
     try {
       const output = execSync(`${scriptPath} ${version}`, { encoding: 'utf-8' });
