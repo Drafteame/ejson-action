@@ -19,7 +19,8 @@ RUN \
   tar xfvz ejson.tar.gz && \
   mv ejson /usr/local/bin/ && \
   chmod +x /usr/local/bin/ejson && \
-  rm ejson.tar.gz
+  rm ejson.tar.gz && \
+  echo "Version de ejson: ${VERSION}"
 
 RUN mkdir -p /opt/ejson/keys
 
