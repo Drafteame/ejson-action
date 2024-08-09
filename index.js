@@ -2,6 +2,8 @@ import core from "@actions/core";
 
 import Action from "./src/Action.js";
 
+const { execSync } = require('child_process');
+
 const main = async () => {
   const action = new Action(
     core.getInput("action"),
@@ -20,5 +22,19 @@ const main = async () => {
     process.exit(1);
   }
 };
+
+const ejsonVersion = () => {
+  const version = core.getInput("ejson_version");
+
+    try {
+      const output = execSync(`./script.sh ${version}`, { encoding: 'utf-8' });
+      console.log(output);
+    } catch (error) {
+      console.error(error);
+    }
+
+}
+
+ejsonVersion();
 
 main();
