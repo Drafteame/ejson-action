@@ -3,8 +3,7 @@ import util from "util";
 import cp from "child_process";
 import lodash from "lodash";
 import core from "@actions/core";
-import download from "download";
-import fetch from "node-fetch";
+import axios from "axios";
 
 // The ejson command used for encryption and decryption
 const ejson = "ejson";
@@ -175,30 +174,34 @@ export default class Action {
   async #downloadEjsonBin() {
     let version = this.#ejsonVersion;
     const testURL = `https://github.com/Shopify/ejson/releases/tag/v${version}`;
+    const outputPath = "/usr/local/bin/ejson";
 
-    const response = await fetch(testURL);
-    if (!response.ok) {
+    try {
+      await axios.get(testURL);
+    } catch (error) {
       version = await this.#getLatestEjsonVersion();
     }
-    const ejsonBinURL = `https://github.com/Shopify/ejson/releases/download/v${version}/ejson_${version}_linux_amd64.tar.gz`;
-    const downloadFile = await fetch(ejsonBinURL);
-    const arrayBuffer = await downloadFile.arrayBuffer();
-    const binary = Buffer.from(arrayBuffer);
 
-    fs.writeFileSync("/usr/local/bin/ejson", binary);
+    const ejsonBinURL = `https://github.com/Shopify/ejson/releases/download/v${version}/ejson_${version}_linux_amd64.tar.gz`;
+    const response = await axios(ejsonBinURL, { responseType: "stream" });
+    response.data.pipe(fs.createWriteStream(outputPath));
+    await new Promise((resolve, reject) => {
+      response.data.on("end", resolve);
+      response.data.on("error", reject);
+    });
+
     fs.chmodSync("/usr/local/bin/ejson", 0o755);
 
-    //await this.#printVersion();
+    await this.#printVersion();
   }
 
   async #getLatestEjsonVersion() {
     const url = "https://api.github.com/repos/Shopify/ejson/releases/latest";
 
-    let res = await fetch(url);
-    let tagVersion = res.json().tag_name;
+    let res = await axios.get(url);
+    let tagVersion = res.data.tag_name;
 
     core.info("Latest ejson version: ", tagVersion);
-
     return tagVersion.replace("v", "");
   }
 
