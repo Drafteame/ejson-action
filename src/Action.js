@@ -4,6 +4,7 @@ import cp from "child_process";
 import lodash from "lodash";
 import core from "@actions/core";
 import axios from "axios";
+import targz from "targz";
 
 // The ejson command used for encryption and decryption
 const ejson = "ejson";
