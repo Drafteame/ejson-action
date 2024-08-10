@@ -183,7 +183,6 @@ export default class Action {
     }
 
     const ejsonBinURL = `https://github.com/Shopify/ejson/releases/download/v${version}/ejson_${version}_linux_amd64.tar.gz`;
-    const outputPath = "";
     const response = await axios(ejsonBinURL, { responseType: "stream" });
 
     await new Promise((resolve, reject) => {
@@ -207,6 +206,7 @@ export default class Action {
     });
 
     fs.chmodSync("/usr/local/bin/ejson", 0o755);
+    core.info(`Ejson version downloaded: ${version}`);
   }
 
   async #getLatestEjsonVersion() {
@@ -215,7 +215,7 @@ export default class Action {
     let res = await axios.get(url);
     let tagVersion = res.data.tag_name;
 
-    core.info("Latest ejson version: ", tagVersion);
+    core.info(`Latest ejson version: ${tagVersion}`);
     return tagVersion.replace("v", "");
   }
 }
