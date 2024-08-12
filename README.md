@@ -1,6 +1,6 @@
 # ejson-action
 
-Simple github action that helps to execute encryption and decryption of json files using the ejson cli. **Current ejson version 1.4.1**.
+Simple github action that helps to execute encryption and decryption of json files using the ejson cli. **Current ejson version 1.5.2**.
 
 ## Configuration
 
@@ -12,6 +12,7 @@ Simple github action that helps to execute encryption and decryption of json fil
     file_path: <path-to-ejson-file>
     private_key: <private-key-string> # needed if encrypt is used as action
     out_file: <path-to-json-file> # File where the decrypted content will be stored (optional)
+    ejson_version: '1.5.2' # Specify the ejson version (optional). Defaults to 'latest' if left empty.
 
 ```
 
@@ -40,6 +41,7 @@ jobs:
         file_path: <path-to-ejson-file>
         private_key: <private-key-string>
         out_file: <path-to-json-file>
+        ejson_version: 'latest'
 
     - name: Decrypted content
       run: |
@@ -58,7 +60,8 @@ jobs:
       with:
         action: encrypt
         file_path: <path-to-ejson-file>
-        private_key: <private-key-string>
+        ejson_version: 'latest'
+
 
     - name: Encrypted content
       run: |
