@@ -177,7 +177,7 @@ export default class Action {
     const testURL = `https://github.com/Shopify/ejson/releases/tag/v${version}`;
 
     try {
-      if (version === "latest") {
+      if (version === "latest" || version === "") {
         version = await this.#getLatestEjsonVersion();
       } else {
         await axios.get(testURL);
