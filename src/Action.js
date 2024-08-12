@@ -192,14 +192,13 @@ export default class Action {
             function (err) {
               if (err) {
                 Promise.reject(err);
+                return;
               }
+              fs.chmodSync("/usr/local/bin/ejson", 0o755);
+              core.info(`Ejson version downloaded: ${version}`);
+              resolve();
             },
           );
-        })
-        .then(() => {
-          fs.chmodSync("/usr/local/bin/ejson", 0o755);
-          core.info(`Ejson version downloaded: ${version}`);
-          resolve();
         })
         .catch((err) => {
           core.error("Error downloading ejson", err.message);
