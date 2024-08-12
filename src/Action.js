@@ -183,30 +183,29 @@ export default class Action {
     }
 
     const ejsonBinURL = `https://github.com/Shopify/ejson/releases/download/v${version}/ejson_${version}_linux_amd64.tar.gz`;
-    const response = await axios(ejsonBinURL, { responseType: "stream" });
 
-    await new Promise((resolve, reject) => {
-      const fileStream = fs.createWriteStream("/usr/local/bin/ejson.tar.gz");
-      response.data.pipe(fileStream);
-      fileStream.on("finish", resolve);
-      fileStream.on("error", reject);
+    return new Promise((resolve, reject) => {
+      this.#download(ejsonBinURL)
+        .then(() => {
+          targz.decompress(
+            { src: "/usr/local/bin/ejson.tar.gz", dest: "/usr/local/bin/" },
+            function (err) {
+              if (err) {
+                Promise.reject(err);
+              }
+            },
+          );
+        })
+        .then(() => {
+          fs.chmodSync("/usr/local/bin/ejson", 0o755);
+          core.info(`Ejson version downloaded: ${version}`);
+          resolve();
+        })
+        .catch((err) => {
+          core.error("Error downloading ejson", err.message);
+          reject(err);
+        });
     });
-
-    await new Promise((resolve, reject) => {
-      targz.decompress(
-        { src: "/usr/local/bin/ejson.tar.gz", dest: "/usr/local/bin/" },
-        function (err) {
-          if (err) {
-            reject(err);
-          } else {
-            resolve();
-          }
-        },
-      );
-    });
-
-    fs.chmodSync("/usr/local/bin/ejson", 0o755);
-    core.info(`Ejson version downloaded: ${version}`);
   }
 
   async #getLatestEjsonVersion() {
@@ -217,5 +216,15 @@ export default class Action {
 
     core.info(`Latest ejson version: ${tagVersion}`);
     return tagVersion.replace("v", "");
+  }
+
+  async #download(url) {
+    const response = await axios(url, { responseType: "stream" });
+    return new Promise((resolve, reject) => {
+      const fileStream = fs.createWriteStream("/usr/local/bin/ejson.tar.gz");
+      response.data.pipe(fileStream);
+      fileStream.on("finish", resolve);
+      fileStream.on("error", reject);
+    });
   }
 }
