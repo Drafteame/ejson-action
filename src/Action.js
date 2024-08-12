@@ -177,8 +177,15 @@ export default class Action {
     const testURL = `https://github.com/Shopify/ejson/releases/tag/v${version}`;
 
     try {
-      await axios.get(testURL);
+      if (version === "latest") {
+        version = await this.#getLatestEjsonVersion();
+      } else {
+        await axios.get(testURL);
+      }
     } catch (error) {
+      core.warning(
+        `The specified version ${version} does not exist. Using the latest version available instead.`,
+      );
       version = await this.#getLatestEjsonVersion();
     }
 
