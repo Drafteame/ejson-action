@@ -191,27 +191,26 @@ export default class Action {
 
     const ejsonBinURL = `https://github.com/Shopify/ejson/releases/download/v${version}/ejson_${version}_linux_amd64.tar.gz`;
 
-    return new Promise((resolve, reject) => {
-      this.#download(ejsonBinURL)
-        .then(() => {
-          targz.decompress(
-            { src: "/usr/local/bin/ejson.tar.gz", dest: "/usr/local/bin/" },
-            function (err) {
-              if (err) {
-                Promise.reject(err);
-                return;
-              }
-              fs.chmodSync("/usr/local/bin/ejson", 0o755);
-              core.info(`Ejson version downloaded: ${version}`);
-              resolve();
-            },
-          );
-        })
-        .catch((err) => {
-          core.error("Error downloading ejson", err.message);
-          reject(err);
-        });
-    });
+    await this.#download(
+      ejsonBinURL,
+      this.decompress.bind(this, version),
+      (err) => {
+        throw err;
+      },
+    );
+  }
+
+  decompress(version) {
+    targz.decompress(
+      { src: "/usr/local/bin/ejson.tar.gz", dest: "/usr/local/bin/" },
+      function (err) {
+        if (err) {
+          throw err;
+        }
+        fs.chmodSync("/usr/local/bin/ejson", 0o755);
+        core.info(`Ejson version downloaded: ${version}`);
+      },
+    );
   }
 
   async #getLatestEjsonVersion() {
@@ -224,13 +223,13 @@ export default class Action {
     return tagVersion.replace("v", "");
   }
 
-  async #download(url) {
-    const response = await axios(url, { responseType: "stream" });
-    return new Promise((resolve, reject) => {
-      const fileStream = fs.createWriteStream("/usr/local/bin/ejson.tar.gz");
-      response.data.pipe(fileStream);
-      fileStream.on("finish", resolve);
-      fileStream.on("error", reject);
-    });
+  async #download(url, finishCAll, errorCall) {
+    const response = await axios.get(url, { responseType: "stream" });
+
+    const fileStream = fs.createWriteStream("/usr/local/bin/ejson.tar.gz");
+
+    response.data.pipe(fileStream);
+    fileStream.on("finish", finishCAll);
+    fileStream.on("error", errorCall);
   }
 }
