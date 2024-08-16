@@ -52,10 +52,19 @@ describe("Action", async () => {
     });
 
     fsCreateWriteStreamStub.withArgs(path).returns({
-      on: sinon.stub().returns(),
+      on: (action, callback) => {
+        if (action === "finish") {
+          callback();
+        }
+      },
     });
 
-    targzDecompressStub.resolves();
+    targzDecompressStub
+      .withArgs({ src: path, dest: "/usr/local/bin/" })
+      .callsFake((opts, callback) => {
+        callback();
+      });
+
     fsChmodSyncStub.withArgs(bin, 0o755).returns();
 
     fsChmodSyncStub.returns();
@@ -67,16 +76,10 @@ describe("Action", async () => {
       stderr: { toString: () => "Error" },
     });
 
-    const command = "ejson encrypt 'file_path'";
     const action = new Action("encrypt", "file_path", "", "", "1.4.1");
 
     action.exec = execStub;
 
-    try {
-      await action.run();
-      expect.fail("Expected an error");
-    } catch (e) {
-      expect(e.message).to.equal("Error");
-    }
+    await expect(action.run()).to.be.rejectedWith("Error");
   });
 });

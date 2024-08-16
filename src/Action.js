@@ -191,26 +191,27 @@ export default class Action {
 
     const ejsonBinURL = `https://github.com/Shopify/ejson/releases/download/v${version}/ejson_${version}_linux_amd64.tar.gz`;
 
-    await this.#download(
-      ejsonBinURL,
-      this.decompress.bind(this, version),
-      (err) => {
-        throw err;
-      },
-    );
+    await this.#download(ejsonBinURL);
+
+    await this.#decompress(version);
   }
 
-  decompress(version) {
-    targz.decompress(
-      { src: "/usr/local/bin/ejson.tar.gz", dest: "/usr/local/bin/" },
-      function (err) {
-        if (err) {
-          throw err;
-        }
-        fs.chmodSync("/usr/local/bin/ejson", 0o755);
-        core.info(`Ejson version downloaded: ${version}`);
-      },
-    );
+  #decompress(version) {
+    core.info("Decompressing ejson binary...");
+
+    return new Promise((resolve, reject) => {
+      targz.decompress(
+        { src: "/usr/local/bin/ejson.tar.gz", dest: "/usr/local/bin/" },
+        function (err) {
+          if (err) {
+            reject(err);
+          }
+          fs.chmodSync("/usr/local/bin/ejson", 0o755);
+          core.info(`Ejson version downloaded: ${version}`);
+          resolve();
+        },
+      );
+    });
   }
 
   async #getLatestEjsonVersion() {
@@ -223,13 +224,25 @@ export default class Action {
     return tagVersion.replace("v", "");
   }
 
-  async #download(url, finishCAll, errorCall) {
+  async #download(url) {
+    core.info(`Downloading ejson from: ${url}`);
+
     const response = await axios.get(url, { responseType: "stream" });
 
     const fileStream = fs.createWriteStream("/usr/local/bin/ejson.tar.gz");
 
+    core.info("Downloading...");
+
     response.data.pipe(fileStream);
-    fileStream.on("finish", finishCAll);
-    fileStream.on("error", errorCall);
+
+    return new Promise((resolve, reject) => {
+      const resolveCall = () => {
+        core.info("Download completed...");
+        resolve();
+      };
+
+      fileStream.on("finish", resolveCall);
+      fileStream.on("error", reject);
+    });
   }
 }

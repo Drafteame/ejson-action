@@ -22,4 +22,6 @@ const main = async () => {
   }
 };
 
-main();
+(async function () {
+  await main();
+})();
