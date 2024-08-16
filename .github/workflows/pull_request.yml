@@ -22,23 +22,24 @@ jobs:
       - name: Lint
         run: npm run lint
 
-  # test:
-  # name: Test
-  # runs-on: ubuntu-latest
-  # steps:
-  # - name: Checkout
-  # uses: actions/checkout@v4
+  test:
+    name: Test
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
 
-  # - name: Install NodeJS
-  # uses: actions/setup-node@v3
-  # with:
-  # node-version: "20"
+      - name: Install NodeJS
+        uses: actions/setup-node@v3
+        with:
+          node-version: "20"
 
-  # - name: Install dependencies
-  # run: npm install
+      - name: Install dependencies
+        run: npm install
 
-  # - name: Execute tests
-  # run: npm run test
+      - name: Test
+        run: npm test
+
 
   commit_lint:
     runs-on: ubuntu-latest
