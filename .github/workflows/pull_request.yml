@@ -40,7 +40,6 @@ jobs:
       - name: Test
         run: npm test
 
-
   commit_lint:
     runs-on: ubuntu-latest
     steps:

@@ -100,6 +100,7 @@ export default class Action {
 
     core.info("Encrypted successfully...");
     core.info(out);
+    return out;
   }
 
   /**
@@ -174,19 +175,11 @@ export default class Action {
 
   async #downloadEjsonBin() {
     let version = this.#ejsonVersion;
-    const testURL = `https://github.com/Shopify/ejson/releases/tag/v${version}`;
 
-    try {
-      if (version === "latest" || version === "") {
-        version = await this.#getLatestEjsonVersion();
-      } else {
-        await axios.get(testURL);
-      }
-    } catch (error) {
-      core.warning(
-        `The specified version ${version} does not exist. Using the latest version available instead.`,
-      );
+    if (version === "latest" || version === "") {
       version = await this.#getLatestEjsonVersion();
+    } else {
+      version = await this.#verifyEjsonVersion(version);
     }
 
     const ejsonBinURL = `https://github.com/Shopify/ejson/releases/download/v${version}/ejson_${version}_linux_amd64.tar.gz`;
@@ -195,7 +188,17 @@ export default class Action {
 
     await this.#decompress(version);
   }
+  async #verifyEjsonVersion(version) {
+    const testURL = `https://github.com/Shopify/ejson/releases/tag/v${version}`;
 
+    try {
+      await axios.get(testURL);
+      return version;
+    } catch (error) {
+      core.error("Invalid ejson version");
+      return await this.#getLatestEjsonVersion();
+    }
+  }
   #decompress(version) {
     core.info("Decompressing ejson binary...");
 
@@ -205,6 +208,7 @@ export default class Action {
         function (err) {
           if (err) {
             reject(err);
+            return;
           }
           fs.chmodSync("/usr/local/bin/ejson", 0o755);
           core.info(`Ejson version downloaded: ${version}`);
@@ -215,18 +219,20 @@ export default class Action {
   }
 
   async #getLatestEjsonVersion() {
-    const url = "https://api.github.com/repos/Shopify/ejson/releases/latest";
-
-    let res = await axios.get(url);
-    let tagVersion = res.data.tag_name;
-
-    core.info(`Latest ejson version: ${tagVersion}`);
-    return tagVersion.replace("v", "");
+    try {
+      const url = "https://api.github.com/repos/Shopify/ejson/releases/latest";
+      let res = await axios.get(url);
+      let tagVersion = res.data.tag_name;
+      core.info(`Latest ejson version: ${tagVersion}`);
+      return tagVersion.replace("v", "");
+    } catch (e) {
+      core.error("Error getting the latest ejson version");
+      throw new Error("Failed to fetch the latest ejson version");
+    }
   }
 
   async #download(url) {
     core.info(`Downloading ejson from: ${url}`);
-
     const response = await axios.get(url, { responseType: "stream" });
 
     const fileStream = fs.createWriteStream("/usr/local/bin/ejson.tar.gz");
@@ -234,13 +240,11 @@ export default class Action {
     core.info("Downloading...");
 
     response.data.pipe(fileStream);
-
     return new Promise((resolve, reject) => {
       const resolveCall = () => {
         core.info("Download completed...");
         resolve();
       };
-
       fileStream.on("finish", resolveCall);
       fileStream.on("error", reject);
     });
