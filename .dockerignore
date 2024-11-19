@@ -1,4 +1,5 @@
 .github/
+.husky/
 .cz.toml
 eslint.config.mjs
 .prettierignore
