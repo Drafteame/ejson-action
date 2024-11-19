@@ -18,6 +18,8 @@ jobs:
     if: "!startsWith(github.event.head_commit.message, 'bump:')"
     runs-on: ubuntu-latest
     name: "Bump version"
+    outputs:
+      version: ${{ steps.revision.outputs.version }}
     steps:
       - name: Check out
         uses: actions/checkout@v4
@@ -43,7 +45,10 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.ACCESS_TOKEN }}
 
       - name: Print Version
-        run: echo "Bumped to version v${{ env.REVISION }}"
+        id: revision
+        run: |
+          echo "Bumped to version v${{ env.REVISION }}"
+          echo "version=\"v${{ env.REVISION }}\"" >> $GITHUB_OUTPUT
 
   build:
     runs-on: ubuntu-latest
