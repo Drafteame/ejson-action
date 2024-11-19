@@ -11,8 +11,13 @@ if [ $? -ne 0 ]; then
 fi
 
 <<<<<<< HEAD
+<<<<<<< HEAD
 git add --all
 
 =======
 >>>>>>> b043e08 (chore: replace precommit to use husky)
+=======
+git add --all
+
+>>>>>>> d2ff610 (chore: add files after format)
 exit 0
