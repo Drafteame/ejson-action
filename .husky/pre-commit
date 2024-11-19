@@ -1,0 +1,15 @@
+#!/usr/bin/env bash
+
+. "$(dirname "$0")/_/husky.sh"
+
+if [ "$GIT_NV" = "1" ]; then
+  echo "[husky] skipping pre-commit hooks"
+  exit 0
+fi
+
+sh ./.husky/pre-commit-scripts/eslint.sh
+
+if [ $? -ne 0 ]; then
+  echo "[husky] pre-commit hook error"
+  exit 1
+fi
