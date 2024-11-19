@@ -10,6 +10,9 @@ if [ $? -ne 0 ]; then
   exit 1
 fi
 
+<<<<<<< HEAD
 git add --all
 
+=======
+>>>>>>> b043e08 (chore: replace precommit to use husky)
 exit 0
