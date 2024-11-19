@@ -1,7 +1,7 @@
 .github/
+.husky/
 .cz.toml
-.eslintrc.json
-.pre-commit-config.yaml
+eslint.config.mjs
 .prettierignore
 .prettierrc.json
 tests/

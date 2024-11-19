@@ -1,0 +1,16 @@
+#!/usr/bin/env bash
+
+. "$(dirname "$0")/_/husky.sh"
+
+if [ "$GIT_NV" = "1" ]; then
+  echo "[husky] skipping commit-msg hooks"
+  exit 0
+fi
+
+sh ./.husky/commit-msg-scripts/commitizen.sh
+
+if [ $? -ne 0 ]; then
+  echo "[husky] commit-msg hook error"
+  exit 1
+fi
+

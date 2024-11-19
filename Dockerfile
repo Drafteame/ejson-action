@@ -1,4 +1,4 @@
-FROM node:20
+FROM node:22
 
 LABEL "com.github.actions.icon"="blue"
 LABEL "com.github.actions.color"="database"
