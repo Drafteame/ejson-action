@@ -1,3 +1,15 @@
+## v0.5.5 (2024-11-19)
+
+
+- chore: upgrade deps (#16)
+- * chore: replace precommit to use husky
+
+* chore: add files after format
+
+* chore: fix docker build tag
+
+* chore: format
+
 ## v0.5.4 (2024-11-19)
 
 
